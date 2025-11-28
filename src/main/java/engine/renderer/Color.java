@@ -4,6 +4,7 @@ public class Color {
     public static Color RED = new Color(255, 0, 0);
     public static Color GREEN = new Color(0, 255, 0);
     public static Color BLUE = new Color(0, 0, 255);
+    public static Color WHITE = new Color(255);
     private final int red, green, blue, alpha;
     public Color(int r, int g, int b) {
         red = r;

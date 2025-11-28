@@ -2,14 +2,17 @@ package engine.renderer;
 
 import engine.sprite.Vec2;
 import io.github.libsdl4j.api.rect.SDL_FRect;
+import io.github.libsdl4j.api.rect.SDL_Rect;
 import io.github.libsdl4j.api.render.SDL_Renderer;
+import io.github.libsdl4j.api.render.SDL_Texture;
+import io.github.libsdl4j.api.render.SdlRender;
 
 import static io.github.libsdl4j.api.render.SdlRender.*;
 
-public class StandardRenderer implements Renderer {
+public class SdlRenderer implements Renderer {
     private Color backgroundColor;
     private final SDL_Renderer sdlRenderer;
-    public StandardRenderer(SDL_Renderer sdlRenderer) {
+    public SdlRenderer(SDL_Renderer sdlRenderer) {
         this.sdlRenderer = sdlRenderer;
         backgroundColor = new Color("#000000");
     }
@@ -17,6 +20,12 @@ public class StandardRenderer implements Renderer {
     @Override
     public void setBackgroundColor(Color color) {
         backgroundColor = color;
+    }
+
+    @Override
+    public void drawBackground() {
+        SDL_SetRenderDrawColor(sdlRenderer, backgroundColor.redAsByte(), backgroundColor.greenAsByte(), backgroundColor.blueAsByte(), backgroundColor.alphaAsByte());
+        SDL_RenderClear(sdlRenderer);
     }
 
     @Override
@@ -31,9 +40,13 @@ public class StandardRenderer implements Renderer {
     }
 
     @Override
-    public void drawBackground() {
-        SDL_SetRenderDrawColor(sdlRenderer, backgroundColor.redAsByte(), backgroundColor.greenAsByte(), backgroundColor.blueAsByte(), backgroundColor.alphaAsByte());
-        SDL_RenderClear(sdlRenderer);
+    public void drawTexture(Vec2 origin, Vec2 dimensions, SDL_Texture texture) {
+        SDL_Rect rect = new SDL_Rect();
+        rect.x = Math.round((float) origin.x());
+        rect.y = Math.round((float) origin.y());
+        rect.w = Math.round((float) dimensions.x());
+        rect.h = Math.round((float) dimensions.y());
+        SdlRender.SDL_RenderCopy(sdlRenderer, texture, null, rect);
     }
 
     @Override

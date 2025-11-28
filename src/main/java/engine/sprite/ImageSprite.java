@@ -1,18 +1,20 @@
 package engine.sprite;
 
-import engine.renderer.Color;
 import engine.renderer.Renderer;
+import engine.resources.ResourceManager;
+import io.github.libsdl4j.api.render.SDL_Texture;
 
-public class RectangleSprite implements Sprite {
+public class ImageSprite implements Sprite {
     private final Renderer renderer;
+    private final ResourceManager resourceManager;
     private Vec2 origin;
     private Vec2 dimensions;
-    private Color color;
-    public RectangleSprite(Renderer renderer) {
+    private SDL_Texture texture;
+    public ImageSprite(Renderer renderer, ResourceManager resourceManager) {
         this.renderer = renderer;
+        this.resourceManager = resourceManager;
         this.origin = Vec2.ZERO;
         this.dimensions = Vec2.ZERO;
-        this.color = Color.WHITE;
     }
     @Override
     public Vec2 getOrigin() {
@@ -31,14 +33,14 @@ public class RectangleSprite implements Sprite {
 
     @Override
     public void show() {
-        renderer.drawRectangle(origin, dimensions, color);
+        renderer.drawTexture(origin, dimensions, texture);
     }
 
     public void setDimensions(Vec2 dimensions) {
         this.dimensions = dimensions;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setImage(String identifier) {
+        texture = resourceManager.getTexture(identifier);
     }
 }

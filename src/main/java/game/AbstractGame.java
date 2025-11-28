@@ -7,6 +7,8 @@ import engine.renderer.Renderer;
 import engine.renderer.StandardRenderer;
 import engine.sdlbase.SDLBase;
 import engine.sdlbase.StandardSDLBase;
+import engine.sprite.RectangleSprite;
+import engine.sprite.Vec2;
 
 public abstract class AbstractGame {
     private final Renderer renderer;
@@ -38,5 +40,8 @@ public abstract class AbstractGame {
 
     public void setBackgroundColor(Color color) {
         renderer.setBackgroundColor(color);
+    }
+    public RectangleSprite createRectangleSprite(Vec2 origin, Vec2 dimensions, Color color) {
+        return new RectangleSprite(renderer, origin, dimensions, color);
     }
 }

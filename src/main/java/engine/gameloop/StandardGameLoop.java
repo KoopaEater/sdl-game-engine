@@ -24,6 +24,7 @@ public class StandardGameLoop implements GameLoop {
     @Override
     public void step() {
         long elapsedTime = System.nanoTime() - lastTickTime;
+        lastTickTime += elapsedTime;
         double deltaTime = elapsedTime / UNITS_PER_SECOND;
         tick.tick(deltaTime);
         long now = System.nanoTime();

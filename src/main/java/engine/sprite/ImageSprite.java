@@ -1,18 +1,15 @@
 package engine.sprite;
 
+import engine.image.Image;
 import engine.renderer.Renderer;
-import engine.resources.ResourceManager;
-import io.github.libsdl4j.api.render.SDL_Texture;
 
 public class ImageSprite implements Sprite {
     private final Renderer renderer;
-    private final ResourceManager resourceManager;
     private Vec2 origin;
     private Vec2 dimensions;
-    private SDL_Texture texture;
-    public ImageSprite(Renderer renderer, ResourceManager resourceManager) {
+    private Image image;
+    public ImageSprite(Renderer renderer) {
         this.renderer = renderer;
-        this.resourceManager = resourceManager;
         this.origin = Vec2.ZERO;
         this.dimensions = Vec2.ZERO;
     }
@@ -33,14 +30,14 @@ public class ImageSprite implements Sprite {
 
     @Override
     public void show() {
-        renderer.drawTexture(origin, dimensions, texture);
+        renderer.drawTexture(origin, dimensions, image.getTexture());
     }
 
     public void setDimensions(Vec2 dimensions) {
         this.dimensions = dimensions;
     }
 
-    public void setImage(String identifier) {
-        texture = resourceManager.getTexture(identifier);
+    public void setImage(Image image) {
+        this.image = image;
     }
 }

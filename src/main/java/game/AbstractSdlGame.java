@@ -2,11 +2,11 @@ package game;
 
 import engine.gameloop.GameLoop;
 import engine.gameloop.StandardGameLoop;
+import engine.image.Image;
+import engine.image.StandardImage;
 import engine.renderer.Color;
 import engine.renderer.Renderer;
-import engine.renderer.SdlRenderer;
-import engine.resources.ResourceManager;
-import engine.resources.SdlResourceManager;
+import engine.renderer.StandardRenderer;
 import engine.sdlbase.SDLBase;
 import engine.sdlbase.StandardSDLBase;
 import engine.sprite.ImageSprite;
@@ -15,15 +15,13 @@ import engine.sprite.Vec2;
 
 public abstract class AbstractSdlGame {
     private final Renderer renderer;
-    private final ResourceManager resourceManager;
     public AbstractSdlGame(String title, int width, int height, int tickRate) {
         GameLoop gameLoop = new StandardGameLoop(tickRate);
         gameLoop.setSetupTick(this::fullSetup);
         gameLoop.setTick(this::fullTick);
         gameLoop.setFixedTick(this::fullFixedTick);
         SDLBase base = new StandardSDLBase(title, width, height, gameLoop);
-        renderer = new SdlRenderer(base.getRenderer());
-        resourceManager = new SdlResourceManager(base.getRenderer());
+        renderer = new StandardRenderer(base.getRenderer());
         base.start();
     }
 
@@ -53,16 +51,16 @@ public abstract class AbstractSdlGame {
         sprite.setColor(color);
         return sprite;
     }
-    protected ImageSprite createImageSprite(Vec2 origin, Vec2 dimensions, String imgIdentifier) {
-        ImageSprite sprite = new ImageSprite(renderer, resourceManager);
+    protected ImageSprite createImageSprite(Vec2 origin, Vec2 dimensions, Image image) {
+        ImageSprite sprite = new ImageSprite(renderer);
         sprite.moveTo(origin);
         sprite.setDimensions(dimensions);
-        sprite.setImage(imgIdentifier);
+        sprite.setImage(image);
         return sprite;
     }
 
 
-    protected void loadImage(String identifier, String path) {
-        resourceManager.loadImage(identifier, path);
+    protected Image loadImage(String path) {
+        return new StandardImage(renderer, path);
     }
 }

@@ -9,12 +9,17 @@ import io.github.libsdl4j.api.render.SdlRender;
 
 import static io.github.libsdl4j.api.render.SdlRender.*;
 
-public class SdlRenderer implements Renderer {
+public class StandardRenderer implements Renderer {
     private Color backgroundColor;
     private final SDL_Renderer sdlRenderer;
-    public SdlRenderer(SDL_Renderer sdlRenderer) {
+    public StandardRenderer(SDL_Renderer sdlRenderer) {
         this.sdlRenderer = sdlRenderer;
         backgroundColor = new Color("#000000");
+    }
+
+    @Override
+    public SDL_Renderer getSdlRenderer() {
+        return sdlRenderer;
     }
 
     @Override
@@ -32,20 +37,20 @@ public class SdlRenderer implements Renderer {
     public void drawRectangle(Vec2 origin, Vec2 dimensions, Color color) {
         SDL_SetRenderDrawColor(sdlRenderer, color.redAsByte(), color.greenAsByte(), color.blueAsByte(), color.alphaAsByte());
         SDL_FRect rect = new SDL_FRect();
-        rect.x = (float) origin.x();
-        rect.y = (float) origin.y();
-        rect.w = (float) dimensions.x();
-        rect.h = (float) dimensions.y();
+        rect.x = origin.x();
+        rect.y = origin.y();
+        rect.w = dimensions.x();
+        rect.h = dimensions.y();
         SDL_RenderFillRectF(sdlRenderer, rect);
     }
 
     @Override
     public void drawTexture(Vec2 origin, Vec2 dimensions, SDL_Texture texture) {
         SDL_Rect rect = new SDL_Rect();
-        rect.x = Math.round((float) origin.x());
-        rect.y = Math.round((float) origin.y());
-        rect.w = Math.round((float) dimensions.x());
-        rect.h = Math.round((float) dimensions.y());
+        rect.x = origin.intX();
+        rect.y = origin.intY();
+        rect.w = dimensions.intX();
+        rect.h = dimensions.intY();
         SdlRender.SDL_RenderCopy(sdlRenderer, texture, null, rect);
     }
 

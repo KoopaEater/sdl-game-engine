@@ -1,9 +1,12 @@
 package engine.renderer;
 
 import engine.sprite.Vec2;
+import io.github.libsdl4j.api.render.SDL_Renderer;
 import io.github.libsdl4j.api.render.SDL_Texture;
 
 public interface Renderer {
+    SDL_Renderer getSdlRenderer();
+
     void setBackgroundColor(Color color);
 
     void drawBackground();

@@ -1,5 +1,6 @@
 package game;
 
+import engine.image.Image;
 import engine.renderer.Color;
 import engine.sprite.ImageSprite;
 import engine.sprite.RectangleSprite;
@@ -9,7 +10,7 @@ import java.util.Random;
 
 public class ExampleGame extends AbstractSdlGame {
     private RectangleSprite rect;
-    private ImageSprite img;
+    private ImageSprite cat, dog;
     public ExampleGame() {
         super("Example", 1024, 768, 2);
     }
@@ -18,8 +19,11 @@ public class ExampleGame extends AbstractSdlGame {
     void setup() {
         rect = createRectangleSprite(new Vec2(400,300), new Vec2(200, 100), Color.RED);
 
-        loadImage("cat", "cat.jpg");
-        img = createImageSprite(new Vec2(800, 20), new Vec2(200, 100), "cat");
+        Image catImg = loadImage("cat.jpg");
+        cat = createImageSprite(new Vec2(800, 20), new Vec2(200, 100), catImg);
+
+        Image dogImg = loadImage("dog.png");
+        dog = createImageSprite(new Vec2(0, 600), new Vec2(200, 200), dogImg);
     }
 
     @Override
@@ -27,8 +31,10 @@ public class ExampleGame extends AbstractSdlGame {
         rect.move(new Vec2(50 * deltaTime, 0));
         rect.show();
 
-        img.move(new Vec2(-50 * deltaTime, 0));
-        img.show();
+        cat.move(new Vec2(-50 * deltaTime, 0));
+        cat.show();
+
+        dog.show();
     }
 
     @Override

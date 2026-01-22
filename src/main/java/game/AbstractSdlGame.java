@@ -9,6 +9,7 @@ import engine.renderer.Renderer;
 import engine.renderer.StandardRenderer;
 import engine.sdlbase.SDLBase;
 import engine.sdlbase.StandardSDLBase;
+import engine.sprite.EllipseSprite;
 import engine.sprite.ImageSprite;
 import engine.sprite.RectangleSprite;
 import engine.sprite.Vec2;
@@ -46,6 +47,13 @@ public abstract class AbstractSdlGame {
     }
     protected RectangleSprite createRectangleSprite(Vec2 origin, Vec2 dimensions, Color color) {
         RectangleSprite sprite = new RectangleSprite(renderer);
+        sprite.moveTo(origin);
+        sprite.setDimensions(dimensions);
+        sprite.setColor(color);
+        return sprite;
+    }
+    protected EllipseSprite createEllipseSprite(Vec2 origin, Vec2 dimensions, Color color) {
+        EllipseSprite sprite = new EllipseSprite(renderer);
         sprite.moveTo(origin);
         sprite.setDimensions(dimensions);
         sprite.setColor(color);

@@ -14,4 +14,5 @@ public class Vec2 {
     public float y() { return y; }
     public int intX() { return (int) x; }
     public int intY() { return (int) y; }
+    public String toString() { return "(" + x + ", " + y + ")"; }
 }

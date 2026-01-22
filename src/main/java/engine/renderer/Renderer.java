@@ -11,6 +11,7 @@ public interface Renderer {
 
     void drawBackground();
     void drawRectangle(Vec2 origin, Vec2 dimensions, Color color);
+    void drawEllipse(Vec2 origin, Vec2 dimensions, Color color);
     void drawTexture(Vec2 origin, Vec2 dimensions, SDL_Texture texture);
 
     void render();

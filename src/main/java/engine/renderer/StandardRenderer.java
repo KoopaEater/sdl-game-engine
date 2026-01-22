@@ -45,6 +45,27 @@ public class StandardRenderer implements Renderer {
     }
 
     @Override
+    public void drawEllipse(Vec2 origin, Vec2 dimensions, Color color) {
+        SDL_SetRenderDrawColor(sdlRenderer, color.redAsByte(), color.greenAsByte(), color.blueAsByte(), color.alphaAsByte());
+        int cx = origin.intX();
+        int cy = origin.intY();
+        int rx = dimensions.intX() / 2;
+        int ry = dimensions.intY() / 2;
+        int w = dimensions.intX();
+        int h = dimensions.intY();
+        for (int j = 0; j < h; j++) {
+            int y = cy - ry + j;
+            for (int i = 0; i < w; i++) {
+                int x = cx - rx + i;
+                double test = Math.pow(x - cx, 2) / Math.pow(rx, 2) + Math.pow(y - cy, 2) / Math.pow(ry, 2);
+                if (test <= 1) {
+                    SDL_RenderDrawPoint(sdlRenderer, x, y);
+                }
+            }
+        }
+    }
+
+    @Override
     public void drawTexture(Vec2 origin, Vec2 dimensions, SDL_Texture texture) {
         SDL_Rect rect = new SDL_Rect();
         rect.x = origin.intX();

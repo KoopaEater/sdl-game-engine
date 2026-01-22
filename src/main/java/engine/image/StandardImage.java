@@ -49,7 +49,7 @@ public class StandardImage implements Image {
         for (int i = 0; i < pixels.length; i++) {
             mem.setInt((long) i * 4, pixels[i]);
         }
-        SDL_Surface surface = SdlSurface.SDL_CreateRGBSurfaceWithFormatFrom(mem, dimensions.intX(), dimensions.intY(), 32, dimensions.intX()*4, SDL_PixelFormatEnum.SDL_PIXELFORMAT_ABGR8888);
+        SDL_Surface surface = SdlSurface.SDL_CreateRGBSurfaceWithFormatFrom(mem, dimensions.intX(), dimensions.intY(), 32, dimensions.intX()*4, SDL_PixelFormatEnum.SDL_PIXELFORMAT_ARGB8888);
         SDL_Texture texture = SdlRender.SDL_CreateTextureFromSurface(renderer.getSdlRenderer(), surface);
         SdlSurface.SDL_FreeSurface(surface);
         this.texture = texture;

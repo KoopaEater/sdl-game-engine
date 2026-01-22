@@ -52,4 +52,7 @@ public class Color {
     public byte alphaAsByte() {
         return (byte) alpha;
     }
+    public Color withTransparency(double transparency) {
+        return new Color(red, green, blue, (int) (alpha * (1-transparency)));
+    }
 }

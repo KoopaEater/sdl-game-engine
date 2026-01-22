@@ -26,7 +26,7 @@ public class ExampleGame extends AbstractSdlGame {
         ellipseWidth = 100;
         ellipseHeight = 50;
 
-        rect = createRectangleSprite(new Vec2(400,300), new Vec2(200, 100), Color.RED);
+        rect = createRectangleSprite(new Vec2(400,300), new Vec2(200, 100), Color.RED.withTransparency(0.5));
         ellipse = createEllipseSprite(new Vec2(100, 200), new Vec2(ellipseWidth, ellipseHeight), Color.BLUE);
 
         Image catImg = loadImage("cat.jpg");

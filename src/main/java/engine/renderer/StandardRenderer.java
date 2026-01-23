@@ -9,6 +9,7 @@ import io.github.libsdl4j.api.render.SDL_Texture;
 import io.github.libsdl4j.api.render.SdlRender;
 
 import java.util.List;
+import java.util.function.BiPredicate;
 
 import static io.github.libsdl4j.api.render.SdlRender.*;
 
@@ -58,32 +59,34 @@ public class StandardRenderer implements Renderer {
         double ry_sq = ry * ry;
         int w = dimensions.intX();
         int h = dimensions.intY();
+
+        BiPredicate<Double, Double> testInsideEllipse = (x, y) ->
+             Math.pow(x - cx, 2) / rx_sq + Math.pow(y - cy, 2) / ry_sq <= 1;
+
+        // For antialiasing
+        final double MAX_SAMPLE_DIST = 0.5;
+        double sampleDist = 2 * MAX_SAMPLE_DIST;
+        final int SAMPLE_COUNT = 9; // Preferably something that can be square-rooted
+        int samplesPerAxis = (int) Math.sqrt(SAMPLE_COUNT);
+        double distBetweenSamples = sampleDist / samplesPerAxis;
+
         for (int j = 0; j < h; j++) {
-            int y = cy - ry + j;
-            double y0 = y;
-            double y1 = y + 0.5;
-            double y2 = y - 0.5;
+            int py = cy - ry + j;
             for (int i = 0; i < w; i++) {
-                int x = cx - rx + i;
-                double x0 = x;
-                double x1 = x + 0.5;
-                double x2 = x - 0.5;
-                boolean test0 = Math.pow(x0 - cx, 2) / rx_sq + Math.pow(y0 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test1 = Math.pow(x1 - cx, 2) / rx_sq + Math.pow(y0 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test2 = Math.pow(x2 - cx, 2) / rx_sq + Math.pow(y0 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test3 = Math.pow(x0 - cx, 2) / rx_sq + Math.pow(y1 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test4 = Math.pow(x1 - cx, 2) / rx_sq + Math.pow(y1 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test5 = Math.pow(x2 - cx, 2) / rx_sq + Math.pow(y1 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test6 = Math.pow(x0 - cx, 2) / rx_sq + Math.pow(y2 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test7 = Math.pow(x1 - cx, 2) / rx_sq + Math.pow(y2 - cy, 2) / Math.pow(ry, 2) <= 1;
-                boolean test8 = Math.pow(x2 - cx, 2) / rx_sq + Math.pow(y2 - cy, 2) / Math.pow(ry, 2) <= 1;
-                List<Boolean> tests = List.of(test0, test1, test2, test3, test4, test5, test6, test7, test8);
-                int positives = (int) tests.stream().filter(b -> b).count();
-                double transparency = 1 - (positives / 9.0);
-                Color colorWithAA = color.withTransparency(transparency);
-                System.out.println(colorWithAA.alphaAsByte());
+                int px = cx - rx + i;
+
+                double positives = 0;
+                for (int k = 0; k < samplesPerAxis; k++) {
+                    for (int l = 0; l < samplesPerAxis; l++) {
+                        double x = px - MAX_SAMPLE_DIST + k * distBetweenSamples;
+                        double y = py - MAX_SAMPLE_DIST + l * distBetweenSamples;
+                        positives += testInsideEllipse.test(x, y) ? 1 : 0;
+                    }
+                }
+
+                Color colorWithAA = color.withOpacity(positives / SAMPLE_COUNT);
                 SDL_SetRenderDrawColor(sdlRenderer, colorWithAA.redAsByte(), colorWithAA.greenAsByte(), colorWithAA.blueAsByte(), colorWithAA.alphaAsByte());
-                SDL_RenderDrawPoint(sdlRenderer, x, y);
+                SDL_RenderDrawPoint(sdlRenderer, px, py);
             }
         }
     }

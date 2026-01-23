@@ -2,16 +2,14 @@ package game;
 
 import engine.image.Image;
 import engine.renderer.Color;
-import engine.sprite.EllipseSprite;
-import engine.sprite.ImageSprite;
-import engine.sprite.RectangleSprite;
-import engine.sprite.Vec2;
+import engine.sprite.*;
 
 import java.util.Random;
 
 public class ExampleGame extends AbstractSdlGame {
     private RectangleSprite rect;
     private EllipseSprite ellipse;
+    private CircleSprite circle;
     private ImageSprite cat, dog;
 
     private double ellipseWidth;
@@ -28,6 +26,7 @@ public class ExampleGame extends AbstractSdlGame {
 
         rect = createRectangleSprite(new Vec2(400,300), new Vec2(200, 100), Color.RED.withOpacity(0.5));
         ellipse = createEllipseSprite(new Vec2(100, 200), new Vec2(ellipseWidth, ellipseHeight), Color.BLUE);
+        circle = createCircleSprite(new Vec2(900, 380), 50, Color.GREEN);
 
         Image catImg = loadImage("cat.jpg");
         cat = createImageSprite(new Vec2(800, 20), new Vec2(200, 100), catImg);
@@ -38,6 +37,8 @@ public class ExampleGame extends AbstractSdlGame {
 
     @Override
     void tick(double deltaTime) {
+        circle.show();
+
         rect.move(new Vec2(50 * deltaTime, 0));
         rect.show();
 

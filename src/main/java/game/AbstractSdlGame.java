@@ -9,10 +9,7 @@ import engine.renderer.Renderer;
 import engine.renderer.StandardRenderer;
 import engine.sdlbase.SDLBase;
 import engine.sdlbase.StandardSDLBase;
-import engine.sprite.EllipseSprite;
-import engine.sprite.ImageSprite;
-import engine.sprite.RectangleSprite;
-import engine.sprite.Vec2;
+import engine.sprite.*;
 
 public abstract class AbstractSdlGame {
     private final Renderer renderer;
@@ -56,6 +53,13 @@ public abstract class AbstractSdlGame {
         EllipseSprite sprite = new EllipseSprite(renderer);
         sprite.moveTo(origin);
         sprite.setDimensions(dimensions);
+        sprite.setColor(color);
+        return sprite;
+    }
+    protected CircleSprite createCircleSprite(Vec2 origin, float radius, Color color) {
+        CircleSprite sprite = new CircleSprite(renderer);
+        sprite.moveTo(origin);
+        sprite.setRadius(radius);
         sprite.setColor(color);
         return sprite;
     }

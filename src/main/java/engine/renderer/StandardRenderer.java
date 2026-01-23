@@ -99,6 +99,7 @@ public class StandardRenderer implements Renderer {
                         double yJitter = HashUtil.jitterCentered(px, py, k, l, 1);
                         double x = px + SUBSAMPLE_START_OFFSET + k * SUBSAMPLE_DIST + xJitter * SUBSAMPLE_DIST;
                         double y = py + SUBSAMPLE_START_OFFSET + l * SUBSAMPLE_DIST + yJitter * SUBSAMPLE_DIST;
+                        //noinspection SuspiciousNameCombination
                         positives += testInsideEllipse.applyAsDouble(x, y) <= 1 ? 1 : 0;
                     }
                 }

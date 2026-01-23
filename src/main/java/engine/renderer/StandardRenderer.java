@@ -8,8 +8,7 @@ import io.github.libsdl4j.api.render.SDL_Renderer;
 import io.github.libsdl4j.api.render.SDL_Texture;
 import io.github.libsdl4j.api.render.SdlRender;
 
-import java.util.List;
-import java.util.function.BiPredicate;
+import java.util.function.DoubleBinaryOperator;
 
 import static io.github.libsdl4j.api.render.SdlRender.*;
 
@@ -49,42 +48,62 @@ public class StandardRenderer implements Renderer {
         SDL_RenderFillRectF(sdlRenderer, rect);
     }
 
+    // For antialiasing
+    final int SUBSAMPLE_COUNT = 16; // Preferably something that can be square-rooted
+    final int SUBSAMPLES_PER_AXIS = (int) Math.sqrt(SUBSAMPLE_COUNT);
+    final double SUBSAMPLE_DIST = 1.0 / SUBSAMPLES_PER_AXIS;
+    final double SUBSAMPLE_START_OFFSET = SUBSAMPLE_DIST / 2 - 0.5;
     @Override
     public void drawEllipse(Vec2 origin, Vec2 dimensions, Color color) {
         int cx = origin.intX();
         int cy = origin.intY();
         int rx = dimensions.intX() / 2;
         int ry = dimensions.intY() / 2;
-        double rx_sq = rx * rx;
-        double ry_sq = ry * ry;
+        if (rx <= 0 || ry <= 0) return;
+        double inv_rx_sq = 1.0 / (rx * rx);
+        double inv_ry_sq = 1.0 / (ry * ry);
         int w = dimensions.intX();
         int h = dimensions.intY();
 
-        BiPredicate<Double, Double> testInsideEllipse = (x, y) ->
-             Math.pow(x - cx, 2) / rx_sq + Math.pow(y - cy, 2) / ry_sq <= 1;
+        DoubleBinaryOperator testInsideEllipse = (x, y) -> {
+            double dx = x - cx;
+            double dy = y - cy;
+            return (dx * dx) * inv_rx_sq + (dy * dy) * inv_ry_sq;
+        };
 
-        // For antialiasing
-        final double MAX_SAMPLE_DIST = 0.5;
-        double sampleDist = 2 * MAX_SAMPLE_DIST;
-        final int SAMPLE_COUNT = 9; // Preferably something that can be square-rooted
-        int samplesPerAxis = (int) Math.sqrt(SAMPLE_COUNT);
-        double distBetweenSamples = sampleDist / samplesPerAxis;
-
-        for (int j = 0; j < h; j++) {
+        for (int j = 0; j <= h; j++) {
             int py = cy - ry + j;
-            for (int i = 0; i < w; i++) {
+            for (int i = 0; i <= w; i++) {
                 int px = cx - rx + i;
 
+                // Courtesy of AI
+                double f = testInsideEllipse.applyAsDouble(px, py);
+                double g = f - 1.0;
+                double gx = 2.0 * (px - cx) * inv_rx_sq;
+                double gy = 2.0 * (py - cy) * inv_ry_sq;
+                double gradLen = Math.hypot(gx, gy);
+                double distPx = (gradLen > 1e-12) ? Math.abs(g) / gradLen : Double.POSITIVE_INFINITY;
+                if (distPx > 0.707) {
+                    if (f <= 1) {
+                        SDL_SetRenderDrawColor(sdlRenderer, color.redAsByte(), color.greenAsByte(), color.blueAsByte(), color.alphaAsByte());
+                        SDL_RenderDrawPoint(sdlRenderer, px, py);
+                    }
+                    continue;
+                }
+
+                // MSAA
                 double positives = 0;
-                for (int k = 0; k < samplesPerAxis; k++) {
-                    for (int l = 0; l < samplesPerAxis; l++) {
-                        double x = px - MAX_SAMPLE_DIST + k * distBetweenSamples;
-                        double y = py - MAX_SAMPLE_DIST + l * distBetweenSamples;
-                        positives += testInsideEllipse.test(x, y) ? 1 : 0;
+                for (int k = 0; k < SUBSAMPLES_PER_AXIS; k++) {
+                    for (int l = 0; l < SUBSAMPLES_PER_AXIS; l++) {
+                        double xJitter = HashUtil.jitterCentered(px, py, k, l, 0);
+                        double yJitter = HashUtil.jitterCentered(px, py, k, l, 1);
+                        double x = px + SUBSAMPLE_START_OFFSET + k * SUBSAMPLE_DIST + xJitter * SUBSAMPLE_DIST;
+                        double y = py + SUBSAMPLE_START_OFFSET + l * SUBSAMPLE_DIST + yJitter * SUBSAMPLE_DIST;
+                        positives += testInsideEllipse.applyAsDouble(x, y) <= 1 ? 1 : 0;
                     }
                 }
 
-                Color colorWithAA = color.withOpacity(positives / SAMPLE_COUNT);
+                Color colorWithAA = color.withOpacity(positives / SUBSAMPLE_COUNT);
                 SDL_SetRenderDrawColor(sdlRenderer, colorWithAA.redAsByte(), colorWithAA.greenAsByte(), colorWithAA.blueAsByte(), colorWithAA.alphaAsByte());
                 SDL_RenderDrawPoint(sdlRenderer, px, py);
             }
@@ -106,3 +125,4 @@ public class StandardRenderer implements Renderer {
         SDL_RenderPresent(sdlRenderer);
     }
 }
+
